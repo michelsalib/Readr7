@@ -1,0 +1,30 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:Readr7.Controls">
+    
+    <Style TargetType="local:ListPicker">
+        <Setter Property="Background" Value="{StaticResource PhoneTextBoxBrush}"/>
+        <!--This resource doesn't exist in beta. You'll need to uncomment this for release tools. -->
+        <Setter Property="Foreground" Value="{StaticResource PhoneTextBoxForegroundBrush}"/>
+        <Setter Property="Foreground" Value="Black"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="BorderBrush" Value="{StaticResource PhoneForegroundBrush}"/>
+        <Setter Property="Padding" Value="0"/>
+        <!--<Setter Property="MinHeight" Value="50" />-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local:ListPicker">
+                    <ScrollViewer x:Name="ScrollViewer" Foreground="{TemplateBinding Foreground}" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}">
+                        <ItemsPresenter/>
+                    </ScrollViewer>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+       
+   
+
+</ResourceDictionary>
