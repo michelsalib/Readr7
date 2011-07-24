@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using GalaSoft.MvvmLight;
 
-namespace Readr7.Model
+namespace Readr7.Model.Entites
 {
     public class Item : ViewModelBase
     {

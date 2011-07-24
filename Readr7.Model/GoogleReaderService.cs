@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO.IsolatedStorage;
 using System.Linq;
-using Readr7.Model;
+using Readr7.Model.Entites;
 using RestSharp;
 
-namespace Readr7.Services
+namespace Readr7.Model
 {
     public class GoogleReaderService
     {
@@ -147,6 +147,20 @@ namespace Readr7.Services
             {
                 _endCall();
                 callback(t.Data.Tags);
+            });
+        }
+
+        public void GetUnreadCount(Action<int> callback)
+        {
+            var request = new RestRequest("/reader/api/0/unread-count");
+            request.AddParameter("output", "json");
+
+            _addCall();
+            _client.ExecuteAsync<UnreadCounts>(request, t =>
+            {
+                _endCall();
+                var unread = t.Data.Unreadcounts.FirstOrDefault(u => u.Id.EndsWith("/state/com.google/reading-list"));
+                callback(unread != null ? unread.Count : 0);
             });
         }
 

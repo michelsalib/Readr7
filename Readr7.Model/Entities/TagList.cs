@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Readr7.Model
+namespace Readr7.Model.Entites
 {
     public class TagList
     {

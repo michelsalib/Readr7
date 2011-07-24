@@ -1,7 +1,7 @@
 ﻿using System;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Readr7.Services;
+using Readr7.Model;
 
 namespace Readr7.Controls
 {

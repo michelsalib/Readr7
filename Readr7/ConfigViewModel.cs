@@ -1,9 +1,7 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
 using GalaSoft.MvvmLight;
 using Readr7.Model;
-using Readr7.Services;
-using Readr7.Utils;
+using Readr7.Model.Entites;
 
 namespace Readr7
 {

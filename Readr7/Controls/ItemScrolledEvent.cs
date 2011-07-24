@@ -1,5 +1,5 @@
 ﻿using System;
-using Readr7.Model;
+using Readr7.Model.Entites;
 
 namespace Readr7.Controls
 {

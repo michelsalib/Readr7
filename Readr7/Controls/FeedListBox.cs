@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Readr7.Model;
+using Readr7.Model.Entites;
 
 namespace Readr7.Controls
 {

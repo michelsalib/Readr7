@@ -63,12 +63,6 @@
     <Reference Include="Microsoft.Practices.ServiceLocation, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\Dependencies\MVVMLightToolkit\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json.WindowsPhone, Version=4.0.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\Dependencies\RestSharp\Newtonsoft.Json.WindowsPhone.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp.WindowsPhone, Version=101.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\Dependencies\RestSharp\RestSharp.WindowsPhone.dll</HintPath>
-    </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
@@ -100,17 +94,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Model\ItemContent.cs" />
-    <Compile Include="Model\Feed.cs" />
-    <Compile Include="Model\Item.cs" />
-    <Compile Include="Model\Origin.cs" />
-    <Compile Include="Model\Ref.cs" />
-    <Compile Include="Model\Tag.cs" />
-    <Compile Include="Model\TagList.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources\DesignData\MainViewDataModel.cs" />
     <Compile Include="Services\AuthenticatedEventArgs.cs" />
-    <Compile Include="Services\GoogleReaderService.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Services\INavigationService.cs" />
     <Compile Include="Services\LoadingEventArgs.cs" />
@@ -162,6 +148,16 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="SplashScreenImage.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Readr7.Model\Readr7.Model.csproj">
+      <Project>{3F73E408-EE92-4BF0-B3E7-276811E1EE4E}</Project>
+      <Name>Readr7.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Readr7.ScheduledTaskAgent\Readr7.ScheduledTaskAgent.csproj">
+      <Project>{B0E964F0-D286-487C-AD64-83F9DCFCDE03}</Project>
+      <Name>Readr7.ScheduledTaskAgent</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

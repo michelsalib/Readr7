@@ -1,13 +1,15 @@
-﻿using GalaSoft.MvvmLight;
-using Readr7.Services;
+﻿using System;
 using System.Linq;
-using System.Collections.ObjectModel;
-using Readr7.Model;
+using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Phone.Tasks;
-using System;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Phone.Scheduler;
+using Microsoft.Phone.Shell;
+using Microsoft.Phone.Tasks;
 using Readr7.Controls;
+using Readr7.Model;
+using Readr7.Model.Entites;
+using Readr7.Services;
 
 namespace Readr7
 {
@@ -47,6 +49,25 @@ namespace Readr7
             }
         }
 
+        private String _unreadCount;
+        public String UnreadCount
+        {
+            get
+            {
+                return _unreadCount;
+            }
+            set
+            {
+                {
+                    if (_unreadCount != value)
+                    {
+                        _unreadCount = value;
+                        RaisePropertyChanged();
+                    }
+                }
+            }
+        }
+
         public String Title
         {
             get
@@ -69,8 +90,10 @@ namespace Readr7
             {
                 return _feed;
             }
-            set{
-                if(_feed != value){
+            set
+            {
+                if (_feed != value)
+                {
                     _feed = value;
                     RaisePropertyChanged();
                     RaisePropertyChanged("Title");
@@ -86,12 +109,13 @@ namespace Readr7
         public RelayCommand<Item> UnreadCommand { get; private set; }
         public RelayCommand<ItemScrolledEvent> ItemScrolled { get; private set; }
         public RelayCommand<String> NavigateCommand { get; private set; }
-        
+
         public MainViewModel(GoogleReaderService googleReaderService, INavigationService navigationService, ConfigViewModel config)
         {
             // init
             _googleReaderService = googleReaderService;
             _config = config;
+            UnreadCount = "-";
 
             // commands
             FeedSelectedCommand = new RelayCommand<Item>(i =>
@@ -156,8 +180,7 @@ namespace Readr7
 
         private void _read(Item item, bool read = true)
         {
-
-            if (!item.Read)
+            if (item.Read != read)
             {
                 item.Read = read;
                 _googleReaderService.MarkAsRead(item, read);
@@ -169,6 +192,15 @@ namespace Readr7
             IsAuthenticated = false;
             Feed = null;
             Messenger.Default.Send<bool>(false, "authenticate");
+
+            // tile update
+            var tileUpdater = ScheduledActionService.Find("TileUpdater") as PeriodicTask;
+            if (tileUpdater != null)
+                ScheduledActionService.Remove("TileUpdater");
+            ShellTile.ActiveTiles.First().Update(new StandardTileData()
+            {
+                Count = 0
+            });
         }
 
         private void _logIn()
@@ -177,6 +209,16 @@ namespace Readr7
             _config.Init();
             _refresh();
             Messenger.Default.Send<bool>(true, "authenticate");
+
+            //tile update
+            var tileUpdater = ScheduledActionService.Find("TileUpdater") as PeriodicTask;
+            if (tileUpdater != null)
+            {
+                ScheduledActionService.Remove("TileUpdater");
+            }
+            tileUpdater = new PeriodicTask("TileUpdater");
+            tileUpdater.Description = "Update the Reardr7 count of unread items";
+            ScheduledActionService.Add(tileUpdater);
         }
 
         private void _refresh()
@@ -191,6 +233,14 @@ namespace Readr7
                 {
                     _googleReaderService.GetFeed(f => Feed = f, _config.ShowRead);
                 }
+                _googleReaderService.GetUnreadCount(count =>
+                {
+                    UnreadCount = count.ToString();
+                    ShellTile.ActiveTiles.First().Update(new StandardTileData()
+                    {
+                        Count = count
+                    });
+                });            
             }
         }
     }

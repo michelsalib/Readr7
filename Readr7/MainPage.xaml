@@ -19,7 +19,14 @@
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <controls:Pivot Title="Reardr7">
-            <controls:PivotItem Header="Stream">
+            <controls:PivotItem>
+                <controls:PivotItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Stream ("/>
+                        <TextBlock Text="{Binding UnreadCount}"/>
+                        <TextBlock Text=")"/>
+                    </StackPanel>
+                </controls:PivotItem.Header>
                 <StackPanel>
                     <TextBlock Text="{Binding Title}" FontSize="30"/>
                     <UserControl Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
