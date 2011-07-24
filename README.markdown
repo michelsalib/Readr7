@@ -6,6 +6,7 @@ This is a Google Reader app for windows phone 7 in stage of development. Althoug
 - Select a folder (label)
 - Mark as read/unread
 - Automatically mark as read when you scroll to the next item
+- Support tile update with unread count
 
 ## Dependencies
 The small dependencies are already packaged into the solution.
