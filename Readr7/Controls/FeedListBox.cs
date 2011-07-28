@@ -35,5 +35,12 @@ namespace Readr7.Controls
             return (VisualTreeHelper.FindElementsInHostCoordinates(new Point(200, 235), this)
                     .FirstOrDefault(t => t.GetType() == typeof(ListBoxItem)) as ListBoxItem);
         }
+
+        public void ScrollToTop()
+        {
+            var scroller = GetTemplateChild("ScrollViewer") as ScrollViewer;
+            scroller.InvalidateScrollInfo();
+            scroller.ScrollToVerticalOffset(0);
+        }
     }
 }

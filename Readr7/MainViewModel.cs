@@ -184,6 +184,20 @@ namespace Readr7
             {
                 item.Read = read;
                 _googleReaderService.MarkAsRead(item, read);
+                // deacrease count
+                int count = 0;
+                if (int.TryParse(UnreadCount, out count))
+                {
+                    if (read)
+                        count = count - 1;
+                    else
+                        count = count + 1;
+                    UnreadCount = count.ToString();
+                    ShellTile.ActiveTiles.First().Update(new StandardTileData()
+                    {
+                        Count = count
+                    });
+                }
             }
         }
 

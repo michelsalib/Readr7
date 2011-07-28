@@ -1,5 +1,7 @@
 ﻿using System.Windows;
+using System.Linq;
 using System.Windows.Controls;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace Readr7.Controls
 {
@@ -8,6 +10,11 @@ namespace Readr7.Controls
         public FeedPanel()
         {
             InitializeComponent();
+
+            Messenger.Default.Register<bool>(this, "refresh", b =>
+            {
+                FeedList.ScrollToTop();
+            });
         }
 
         private void ContextMenuOpened(object sender, RoutedEventArgs e)
