@@ -47,6 +47,7 @@
     <Reference Include="GalaSoft.MvvmLight.WP71">
       <HintPath>..\Dependencies\MVVMLightToolkit\GalaSoft.MvvmLight.WP71.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\Dependencies\MVVMLightToolkit\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
@@ -77,8 +78,8 @@
     <Compile Include="Entities\TagList.cs" />
     <Compile Include="Entities\UnreadCount.cs" />
     <Compile Include="Entities\UnreadCounts.cs" />
+    <Compile Include="GlobalLoading.cs" />
     <Compile Include="GoogleReaderService.cs" />
-    <Compile Include="LoadingEventArgs.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />

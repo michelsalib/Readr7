@@ -10,9 +10,12 @@ namespace Readr7.Resources.DesignData
 
         public Feed Feed { get; set; }
 
+        public int UnreadCount { get; set; }
+
         public MainViewDataModel()
         {
             IsAuthenticated = true;
+            UnreadCount = 100;
 
             Feed = new Feed()
             {

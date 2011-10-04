@@ -4,6 +4,8 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using Readr7.Model.Entites;
 using RestSharp;
+using Gi7.Model;
+using System.Net;
 
 namespace Readr7.Model
 {
@@ -11,7 +13,6 @@ namespace Readr7.Model
     {
         private RestClient _client = null;
         private String _token = null;
-        private int _loadingCalls = 0;
 
         public bool IsAuthenticated
         {
@@ -21,18 +22,11 @@ namespace Readr7.Model
             }
         }
 
-        public bool IsLoading
-        {
-            get
-            {
-                return _loadingCalls != 0;
-            }
-        }
-
         public const String ReadTag = "user/-/state/com.google/read";
 
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
-        public event EventHandler<LoadingEventArgs> Loading;
+        public event EventHandler ConnectionError;
+        public event EventHandler Unauthorized;
 
         public GoogleReaderService()
         {
@@ -52,10 +46,10 @@ namespace Readr7.Model
             request.AddParameter("Passwd", password, ParameterType.GetOrPost);
             request.AddParameter("service", "reader", ParameterType.GetOrPost);
 
-            _addCall();
-            client.ExecuteAsync(request, loginData =>
+            GlobalLoading.Instance.IsLoading = true;
+            _call(client, request, loginData =>
             {
-                _endCall();
+                GlobalLoading.Instance.IsLoading = false;
                 var data = loginData.Content.Split('\n').Where(s => !String.IsNullOrWhiteSpace(s)).Select(d =>
                 {
                     var pair = d.Split('=');
@@ -88,10 +82,10 @@ namespace Readr7.Model
         {
             var tokenRequest = new RestRequest("reader/api/0/token", Method.GET);
             tokenRequest.AddParameter("SID", sid, ParameterType.Cookie);
-            _addCall();
-            _client.ExecuteAsync(tokenRequest, r =>
+            GlobalLoading.Instance.IsLoading = true;
+            _call(_client, tokenRequest, r =>
             {
-                _endCall();
+                GlobalLoading.Instance.IsLoading = false;
                 _token = r.Content;
             });
         }
@@ -102,10 +96,10 @@ namespace Readr7.Model
             if (!showRead)
                 feedRequest.AddParameter("xt", ReadTag, ParameterType.GetOrPost);
 
-            _addCall();
-            _client.ExecuteAsync<Feed>(feedRequest, f =>
+            GlobalLoading.Instance.IsLoading = true;
+            _call<Feed>(feedRequest, f =>
             {
-                _endCall();
+                GlobalLoading.Instance.IsLoading = false;
                 callback(f.Data);
             });
         }
@@ -116,10 +110,10 @@ namespace Readr7.Model
             if (!showRead)
                 feedRequest.AddParameter("xt", ReadTag, ParameterType.GetOrPost);
 
-            _addCall();
-            _client.ExecuteAsync<Feed>(feedRequest, f =>
+            GlobalLoading.Instance.IsLoading = true;
+            _call<Feed>(feedRequest, f =>
             {
-                _endCall();
+                GlobalLoading.Instance.IsLoading = false;
                 callback(f.Data);
             });
         }
@@ -133,8 +127,8 @@ namespace Readr7.Model
             request.AddParameter("s", item.Origin.StreamId, ParameterType.GetOrPost);
             request.AddParameter("async", "true", ParameterType.GetOrPost);
 
-            _addCall();
-            _client.ExecuteAsync<Feed>(request, r => { _endCall(); });
+            GlobalLoading.Instance.IsLoading = true;
+            _call<Feed>(request, r => { GlobalLoading.Instance.IsLoading = false; });
         }
 
         public void GetTags(Action<List<Tag>> callback)
@@ -142,10 +136,10 @@ namespace Readr7.Model
             var request = new RestRequest("/reader/api/0/tag/list");
             request.AddParameter("output", "json");
 
-            _addCall();
-            _client.ExecuteAsync<TagList>(request, t =>
+            GlobalLoading.Instance.IsLoading = true;
+            _call<TagList>(request, t =>
             {
-                _endCall();
+                GlobalLoading.Instance.IsLoading = false;
                 callback(t.Data.Tags);
             });
         }
@@ -155,33 +149,64 @@ namespace Readr7.Model
             var request = new RestRequest("/reader/api/0/unread-count");
             request.AddParameter("output", "json");
 
-            _addCall();
-            _client.ExecuteAsync<UnreadCounts>(request, t =>
+            GlobalLoading.Instance.IsLoading = true;
+            _call<UnreadCounts>(request, t =>
             {
-                _endCall();
+                GlobalLoading.Instance.IsLoading = false;
                 var unread = t.Data.Unreadcounts.FirstOrDefault(u => u.Id.EndsWith("/state/com.google/reading-list"));
                 callback(unread != null ? unread.Count : 0);
             });
         }
 
-        private void _addCall()
+        private void _call<T>(RestRequest request, Action<RestResponse<T>> callback)
+             where T : new()
         {
-            _loadingCalls++;
-            if (_loadingCalls == 1)
+            _client.ExecuteAsync<T>(request, r =>
             {
-                if (Loading != null)
-                    Loading(this, new LoadingEventArgs(IsLoading));
-            }
+                if (r.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    if (Unauthorized != null)
+                    {
+                        Unauthorized(this, new EventArgs());
+                    }
+                    GlobalLoading.Instance.IsLoading = false;
+                }
+                else if (r.ResponseStatus == ResponseStatus.Error)
+                {
+                    if (ConnectionError != null)
+                    {
+                        ConnectionError(this, new EventArgs());
+                    }
+                    GlobalLoading.Instance.IsLoading = false;
+                }
+                else
+                    callback(r);
+            });
         }
 
-        private void _endCall()
+        private void _call(RestClient client, RestRequest request, Action<RestResponse> callback)
         {
-            _loadingCalls--;
-            if (_loadingCalls == 0)
+            client.ExecuteAsync(request, r =>
             {
-                if (Loading != null)
-                    Loading(this, new LoadingEventArgs(IsLoading));
-            }
+                if (r.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    if (Unauthorized != null)
+                    {
+                        Unauthorized(this, new EventArgs());
+                    }
+                    GlobalLoading.Instance.IsLoading = false;
+                }
+                else if (r.ResponseStatus == ResponseStatus.Error)
+                {
+                    if (ConnectionError != null)
+                    {
+                        ConnectionError(this, new EventArgs());
+                    }
+                    GlobalLoading.Instance.IsLoading = false;
+                }
+                else
+                    callback(r);
+            });
         }
     }
 }

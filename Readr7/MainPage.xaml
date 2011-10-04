@@ -7,7 +7,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:localControls="clr-namespace:Readr7.Controls"
+    xmlns:Interactivity="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
+    xmlns:Command="clr-namespace:GalaSoft.MvvmLight.Command;assembly=GalaSoft.MvvmLight.Extras.WP71"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="696"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -18,52 +21,76 @@
 
     <!--LayoutRoot is the root grid where all page content is placed-->
     <Grid x:Name="LayoutRoot" Background="Transparent">
-        <controls:Pivot Title="Reardr7">
-            <controls:PivotItem>
-                <controls:PivotItem.Header>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="Stream ("/>
-                        <TextBlock Text="{Binding UnreadCount}"/>
-                        <TextBlock Text=")"/>
-                    </StackPanel>
-                </controls:PivotItem.Header>
-                <StackPanel>
-                    <TextBlock Text="{Binding Title}" FontSize="30"/>
-                    <UserControl Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
-                        <localControls:LoginPanel/>
-                    </UserControl>
-                    <localControls:FeedPanel Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                </StackPanel>
-            </controls:PivotItem>
-            <controls:PivotItem Header="About">
-                <Grid VerticalAlignment="Top">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" TextWrapping="Wrap">
-            This app is brought to you by Michel Salib. Its source code is free and hosted on Github. Feel free to follow and contribute to the repo.
-                    </TextBlock>
-                    <Button Grid.Row="1" HorizontalAlignment="Left" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/michelsalib" Padding="0" BorderThickness="0">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="https://secure.gravatar.com/avatar/5c4663b12b9e6d8dc6dcdfbfb3dc1317?s=34" Width="34" Height="34" />
-                            <TextBlock Text="michelsalib" Margin="10,0,0,0" />
-                        </StackPanel>
-                    </Button>
-                    <Button Grid.Row="2" HorizontalAlignment="Left" Command="{Binding NavigateCommand}" CommandParameter="https://github.com/michelsalib/Readr7" Padding="0" BorderThickness="0" Content="Readr7 repository"/>
-                </Grid>
-            </controls:PivotItem>
-        </controls:Pivot>
-        <ProgressBar Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisibilityConverter}}" IsIndeterminate="{Binding IsLoading}" VerticalAlignment="Top"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--TitlePanel contains the name of the application and page title-->
+        <Grid Grid.Row="0" Margin="12,17,0,0">
+            <TextBlock Text="Readr7" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock Text="Stream" Margin="9,10,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text="{Binding UnreadCount}" Style="{StaticResource PhoneTextTitle1Style}" HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+        </Grid>
+
+        <!--ContentPanel - place additional content here-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0" VerticalAlignment="Top">
+            <StackPanel>
+                <TextBlock Text="{Binding Title}" Margin="9,0" FontSize="30"/>
+                <UserControl Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}">
+                    <localControls:LoginPanel/>
+                </UserControl>
+                <localControls:CompressableListBox Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                   ItemsSource="{Binding Feed.Items}"
+                                                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                   Height="500" x:Name="FeedList"
+                                                   IsSelectionEnabledChanged="IsSelectionEnabledChanged">
+                    <localControls:CompressableListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="-50,0,0,10" Width="440">
+                                <TextBlock Text="{Binding Title}" FontSize="30" TextWrapping="Wrap" Foreground="{Binding Read, Converter={StaticResource ReadConverter}}"/>
+                                <TextBlock Text="{Binding SubTitle}" FontStyle="Italic" TextWrapping="Wrap" Foreground="{Binding Read, Converter={StaticResource ReadConverter}}"/>
+                                <RichTextBox Margin="-10,0,0,0" TextWrapping="Wrap" MaxHeight="1000" TextAlignment="Justify" Foreground="{Binding Read, Converter={StaticResource ReadConverter}}" >
+                                    <Paragraph>
+                                        <InlineUIContainer>
+                                            <Image Source="{Binding Image}" MaxHeight="100" />
+                                        </InlineUIContainer>
+                                        <Run Text="{Binding ReadableContent}" />
+                                    </Paragraph>
+                                </RichTextBox>
+                                <toolkit:ContextMenuService.ContextMenu>
+                                    <toolkit:ContextMenu toolkit:TiltEffect.IsTiltEnabled="True">
+                                        <toolkit:MenuItem Header="Mark as read" Visibility="{Binding Read, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}" Command="{Binding DataContext.ReadCommand, ElementName=FeedList}" CommandParameter="{Binding}"/>
+                                        <toolkit:MenuItem Header="Mark as unread" Visibility="{Binding Read, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding DataContext.UnreadCommand, ElementName=FeedList}" CommandParameter="{Binding}"/>
+                                    </toolkit:ContextMenu>
+                                </toolkit:ContextMenuService.ContextMenu>
+                                <Interactivity:Interaction.Triggers>
+                                    <Interactivity:EventTrigger EventName="Tap">
+                                        <Command:EventToCommand Command="{Binding DataContext.FeedSelectedCommand, ElementName=FeedList}" CommandParameter="{Binding}" />
+                                    </Interactivity:EventTrigger>
+                                </Interactivity:Interaction.Triggers>
+                            </StackPanel>
+                        </DataTemplate>
+                    </localControls:CompressableListBox.ItemTemplate>
+                    <Interactivity:Interaction.Triggers>
+                        <Interactivity:EventTrigger EventName="BottomReached">
+                            <Command:EventToCommand Command="{Binding BottomReached}" />
+                        </Interactivity:EventTrigger>
+                    </Interactivity:Interaction.Triggers>
+                </localControls:CompressableListBox>
+            </StackPanel>
+        </Grid>
     </Grid>
 
     <phone:PhoneApplicationPage.ApplicationBar>
         <shell:ApplicationBar IsVisible="True" IsMenuEnabled="True" >
-            <shell:ApplicationBarIconButton IconUri="/Images/refresh_w.png" Text="Refresh" Click="Refresh"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/select.png" Text="Select" Click="Select"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/check.png" Text="Mark as read" Click="Read"/>
+            <shell:ApplicationBarIconButton IconUri="/Images/refresh.png" Text="Refresh" Click="Refresh"/>
             <shell:ApplicationBar.MenuItems>
                 <shell:ApplicationBarMenuItem Text="Configuration" Click="Configuration"/>
                 <shell:ApplicationBarMenuItem Text="Logout" Click="Logout"/>
+                <shell:ApplicationBarMenuItem Text="About" Click="About"/>
             </shell:ApplicationBar.MenuItems>
         </shell:ApplicationBar>
     </phone:PhoneApplicationPage.ApplicationBar>

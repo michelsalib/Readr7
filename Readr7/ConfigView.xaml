@@ -6,6 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:controls="clr-namespace:Readr7.Controls"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
     FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -13,6 +14,7 @@
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d" d:DesignHeight="768" d:DesignWidth="480"
     shell:SystemTray.IsVisible="True"
+    toolkit:TiltEffect.IsTiltEnabled="True"
     DataContext="{Binding Path=ConfigViewModel, Source={StaticResource ViewModelLocator}}">
 
     <!--LayoutRoot is the root grid where all page content is placed-->
@@ -30,16 +32,16 @@
 
         <!--ContentPanel - place additional content here-->
         <StackPanel Grid.Row="1" Margin="12,0,12,0">
-            <TextBlock Text="Display:" />
-            <controls:ListPicker Height="48" ItemsSource="{Binding Tags}" SelectedItem="{Binding Tag, Mode=TwoWay}">
-                <controls:ListPicker.ItemTemplate>
+            <toolkit:ListPicker Header="Display" ItemsSource="{Binding Tags}" SelectedItem="{Binding Tag, Mode=TwoWay}" DisplayMemberPath="Name">
+                <toolkit:ListPicker.FullModeItemTemplate>
                     <DataTemplate>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Name}" FontSize="26" Margin="10, 6, 0, 8" />
-                        </StackPanel>
+                        <TextBlock Text="{Binding Name}"
+                                    Margin="16 21 0 20"
+                                    FontSize="43" 
+                                    FontFamily="{StaticResource PhoneFontFamilyLight}"/>
                     </DataTemplate>
-                </controls:ListPicker.ItemTemplate>
-            </controls:ListPicker>
+                </toolkit:ListPicker.FullModeItemTemplate>
+            </toolkit:ListPicker>
             <CheckBox Content="Show read item" IsChecked="{Binding ShowRead, Mode=TwoWay}" />
         </StackPanel>
     </Grid>

@@ -32,23 +32,6 @@ namespace Readr7
             }
         }
 
-        private bool _isLoading;
-        public bool IsLoading
-        {
-            get { return _isLoading; }
-            set
-            {
-                {
-                    if (_isLoading != value)
-                    {
-                        _isLoading = value;
-                        RaisePropertyChanged();
-                        RaisePropertyChanged("Title");
-                    }
-                }
-            }
-        }
-
         private String _unreadCount;
         public String UnreadCount
         {
@@ -62,7 +45,7 @@ namespace Readr7
                     if (_unreadCount != value)
                     {
                         _unreadCount = value;
-                        RaisePropertyChanged();
+                        RaisePropertyChanged("UnreadCount");
                     }
                 }
             }
@@ -107,7 +90,7 @@ namespace Readr7
         public RelayCommand<Item> FeedSelectedCommand { get; private set; }
         public RelayCommand<Item> ReadCommand { get; private set; }
         public RelayCommand<Item> UnreadCommand { get; private set; }
-        public RelayCommand<ItemScrolledEvent> ItemScrolled { get; private set; }
+        public RelayCommand BottomReached { get; private set; }
         public RelayCommand<String> NavigateCommand { get; private set; }
 
         public MainViewModel(GoogleReaderService googleReaderService, INavigationService navigationService, ConfigViewModel config)
@@ -115,7 +98,6 @@ namespace Readr7
             // init
             _googleReaderService = googleReaderService;
             _config = config;
-            UnreadCount = "-";
 
             // commands
             FeedSelectedCommand = new RelayCommand<Item>(i =>
@@ -129,13 +111,9 @@ namespace Readr7
                     }.Show();
                 }
             });
-            ItemScrolled = new RelayCommand<ItemScrolledEvent>(o =>
+            BottomReached = new RelayCommand(() =>
             {
-                var readItems = Feed.Items.TakeWhile(i => i != o.Item);
-                foreach (var item in readItems)
-                {
-                    _read(item);
-                }
+                Feed.Items.ForEach(item => _read(item));
             });
             ReadCommand = new RelayCommand<Item>(i => _read(i));
             UnreadCommand = new RelayCommand<Item>(i => _read(i, false));
@@ -150,7 +128,8 @@ namespace Readr7
             // listen to view messenger events
             Messenger.Default.Register<bool>(this, "logout", b => googleReaderService.Logout());
             Messenger.Default.Register<bool>(this, "refresh", b => _refresh());
-            Messenger.Default.Register<bool>(this, "config", b => navigationService.NavigateTo(ViewModelLocator.ConfigView));
+            Messenger.Default.Register<bool>(this, "config", b => navigationService.NavigateTo(ViewModelLocator.ConfigUrl));
+            Messenger.Default.Register<bool>(this, "about", b => navigationService.NavigateTo(ViewModelLocator.AboutUrl));
 
             // init display
             googleReaderService.Authenticated += (s, e) =>
@@ -172,10 +151,6 @@ namespace Readr7
             {
                 _logOut();
             }
-
-            // listen to loading event
-            IsLoading = _googleReaderService.IsLoading;
-            googleReaderService.Loading += (s, e) => { IsLoading = e.IsLoading; };
         }
 
         private void _read(Item item, bool read = true)
@@ -203,6 +178,7 @@ namespace Readr7
 
         private void _logOut()
         {
+            UnreadCount = "";
             IsAuthenticated = false;
             Feed = null;
             Messenger.Default.Send<bool>(false, "authenticate");

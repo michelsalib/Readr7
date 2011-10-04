@@ -43,7 +43,23 @@ namespace Readr7.Services
             }
         }
 
-        public static string ConfigView = "/ConfigView.xaml";
+        public static string AboutUrl = "/AboutView.xaml";
+        public Object AboutViewModel
+        {
+            get
+            {
+                if (ViewModelBase.IsInDesignModeStatic)
+                {
+                    return null;
+                }
+                else
+                {
+                    return new AboutViewModel();
+                }
+            }
+        }
+
+        public static string ConfigUrl = "/ConfigView.xaml";
         public static Object _configViewModel;
         public Object ConfigViewModel
         {

@@ -19,7 +19,7 @@ namespace Readr7
                 if (value != _tags)
                 {
                     _tags = value;
-                    RaisePropertyChanged();
+                    RaisePropertyChanged("Tags");
                 }
             }
         }
@@ -33,7 +33,7 @@ namespace Readr7
                 if (value != _tag && value != null)
                 {
                     _tag = value;
-                    RaisePropertyChanged();
+                    RaisePropertyChanged("Tag");
                 }
             }
         }
@@ -50,7 +50,7 @@ namespace Readr7
                 if (value != _showRead)
                 {
                     _showRead = value;
-                    RaisePropertyChanged();
+                    RaisePropertyChanged("ShowRead");
                 }
             }
         }
@@ -65,13 +65,14 @@ namespace Readr7
         public void Init()
         {
             Tag = Tag.All;
+            Tags = new ObservableCollection<Tag>();
+
+            Tags.Add(Tag);
             ShowRead = false;
             _googleReaderService.GetTags(t =>
             {
-                Tags = new ObservableCollection<Tag>(t);
-                Tags.Insert(0, Tag.All);
+                t.ForEach(tag => Tags.Add(tag));
             });
-
         }
     }
 }

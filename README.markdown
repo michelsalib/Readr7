@@ -12,7 +12,7 @@ This is a Google Reader app for windows phone 7 in stage of development. Althoug
 The small dependencies are already packaged into the solution.
 
 - You must have the mango beta release installed on your phone and the correponding development tools
-- It uses silverlight toolkit recompiled for windows phone 7.1 (beta)
+- It uses silverlight toolkit for windows phone 7.1
 - It uses MVVM Light Toolkit for windows phone 7.1 (beta)
 - It uses RestSharp library
 
