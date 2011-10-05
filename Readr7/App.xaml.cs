@@ -2,7 +2,7 @@
 using System.Windows.Navigation;
 using Microsoft.Phone.Controls;
 using Microsoft.Phone.Shell;
-using Gi7.Model;
+using Gi7.Utils;
 
 namespace Readr7
 {

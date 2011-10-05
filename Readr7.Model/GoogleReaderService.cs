@@ -4,9 +4,7 @@ using System.IO.IsolatedStorage;
 using System.Linq;
 using Readr7.Model.Entites;
 using RestSharp;
-using Gi7.Model;
 using System.Net;
-using System.Windows;
 
 namespace Readr7.Model
 {
@@ -26,6 +24,7 @@ namespace Readr7.Model
         public const String ReadTag = "user/-/state/com.google/read";
 
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
+        public event EventHandler<LoadingEventArgs> Loading;
         public event EventHandler ConnectionError;
         public event EventHandler Unauthorized;
 
@@ -144,26 +143,22 @@ namespace Readr7.Model
         private void _call<T>(RestRequest request, Action<T> callback)
              where T : new()
         {
-            GlobalLoading.Instance.IsLoading = true;
+            if (Loading != null)
+                Loading(this, new LoadingEventArgs(true));
             _client.ExecuteAsync<T>(request, r =>
             {
-                GlobalLoading.Instance.IsLoading = false;
+                if (Loading != null)
+                    Loading(this, new LoadingEventArgs(false));
                 if (r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == HttpStatusCode.Forbidden)
                 {
-                    MessageBox.Show("Wrong credentials.");
                     if (Unauthorized != null)
-                    {
                         Unauthorized(this, new EventArgs());
-                    }
                     Logout();
                 }
                 else if (r.ResponseStatus == ResponseStatus.Error)
                 {
-                    MessageBox.Show("Server unreachable.");
                     if (ConnectionError != null)
-                    {
                         ConnectionError(this, new EventArgs());
-                    }
                 }
                 else
                     callback(r.Data);
@@ -172,26 +167,22 @@ namespace Readr7.Model
 
         private void _call(RestClient client, RestRequest request, Action<RestResponse> callback)
         {
-            GlobalLoading.Instance.IsLoading = true;
+            if (Loading != null)
+                Loading(this, new LoadingEventArgs(true));
             client.ExecuteAsync(request, r =>
             {
-                GlobalLoading.Instance.IsLoading = false;
+                if (Loading != null)
+                    Loading(this, new LoadingEventArgs(false));
                 if (r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == HttpStatusCode.Forbidden)
                 {
-                    MessageBox.Show("Wrong credentials.");
                     if (Unauthorized != null)
-                    {
                         Unauthorized(this, new EventArgs());
-                    }
                     Logout();
                 }
                 else if (r.ResponseStatus == ResponseStatus.Error)
                 {
-                    MessageBox.Show("Server unreachable.");
                     if (ConnectionError != null)
-                    {
                         ConnectionError(this, new EventArgs());
-                    }
                 }
                 else
                     callback(r);

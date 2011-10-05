@@ -47,7 +47,6 @@
     <Reference Include="GalaSoft.MvvmLight.WP71">
       <HintPath>..\Dependencies\MVVMLightToolkit\GalaSoft.MvvmLight.WP71.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Practices.ServiceLocation">
       <HintPath>..\Dependencies\MVVMLightToolkit\Microsoft.Practices.ServiceLocation.dll</HintPath>
     </Reference>
@@ -57,18 +56,16 @@
     <Reference Include="RestSharp.WindowsPhone">
       <HintPath>..\Dependencies\RestSharp\RestSharp.WindowsPhone.dll</HintPath>
     </Reference>
-    <Reference Include="System.Windows" />
     <Reference Include="system" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Windows.Interactivity, Version=3.8.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\Dependencies\MVVMLightToolkit\System.Windows.Interactivity.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Net" />
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticatedEventArgs.cs" />
+    <Compile Include="LoadingEventArgs.cs" />
     <Compile Include="Entities\Feed.cs" />
     <Compile Include="Entities\Item.cs" />
     <Compile Include="Entities\ItemContent.cs" />
@@ -78,7 +75,6 @@
     <Compile Include="Entities\TagList.cs" />
     <Compile Include="Entities\UnreadCount.cs" />
     <Compile Include="Entities\UnreadCounts.cs" />
-    <Compile Include="GlobalLoading.cs" />
     <Compile Include="GoogleReaderService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

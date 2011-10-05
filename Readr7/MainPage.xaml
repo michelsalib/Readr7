@@ -43,7 +43,7 @@
                 <localControls:CompressableListBox Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVisibilityConverter}}"
                                                    ItemsSource="{Binding Feed.Items}"
                                                    ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                                   Height="500" x:Name="FeedList"
+                                                   Height="530" x:Name="FeedList"
                                                    IsSelectionEnabledChanged="IsSelectionEnabledChanged">
                     <localControls:CompressableListBox.ItemTemplate>
                         <DataTemplate>

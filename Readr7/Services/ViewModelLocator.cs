@@ -3,6 +3,8 @@ using GalaSoft.MvvmLight;
 using Readr7.Controls;
 using Readr7.Model;
 using Readr7.Resources.DesignData;
+using System.Windows;
+using Gi7.Utils;
 
 namespace Readr7.Services
 {
@@ -23,6 +25,9 @@ namespace Readr7.Services
                         NavigationService.NavigateTo(ViewModelLocator.MainViewUrl);
                     }
                 };
+                GoogleReaderService.ConnectionError += (s,e) => MessageBox.Show("Server unreachable.");
+                GoogleReaderService.Unauthorized += (s,e) => MessageBox.Show("Wrong credentials.");
+                GoogleReaderService.Loading += (s, e) => GlobalLoading.Instance.IsLoading = e.IsLoading;
             }   
         }
 

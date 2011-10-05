@@ -99,6 +99,7 @@
     <Compile Include="Services\ViewModelLocator.cs" />
     <Compile Include="Utils\Converters\BoolToVisibilityConverter.cs" />
     <Compile Include="Utils\Converters\ReadConverter.cs" />
+    <Compile Include="Utils\GlobalLoading.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
