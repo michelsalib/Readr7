@@ -137,7 +137,6 @@
     <Content Include="Background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Resource Include="iconereaderr7.png" />
     <Content Include="Images\select.png" />
     <Content Include="Images\check.png" />
     <Content Include="Images\refresh.png" />
