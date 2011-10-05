@@ -20,7 +20,7 @@ namespace Readr7.Services
             if (EnsureMainFrame())
             {
                 _mainFrame.Navigate(new Uri(pageUri, UriKind.RelativeOrAbsolute));
-                if (pageUri.Contains('?'))
+                if (pageUri.Contains("?"))
                 {
                     _currentQueryString = pageUri.Substring(pageUri.IndexOf('?') + 1).Split('&').Select(i =>
                     {
@@ -29,9 +29,7 @@ namespace Readr7.Services
                     }).ToDictionary(i => i.Key, i => i.Value);
                 }
                 else
-                {
                     _currentQueryString = new Dictionary<string, string>();
-                }
             }
         }
 
@@ -70,7 +68,6 @@ namespace Readr7.Services
             return false;
         }
 
-
         public string GetParameter(string key, string defaultValue = "")
         {
             var result = defaultValue;
@@ -81,6 +78,15 @@ namespace Readr7.Services
             }
 
             return result;
+        }
+
+        public string CurrentUri()
+        {
+            if (EnsureMainFrame())
+            {
+                return _mainFrame.CurrentSource.ToString();
+            }
+            return "unknown";
         }
     }
 }

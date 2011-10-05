@@ -17,9 +17,16 @@ namespace Readr7.Services
             {
                 GoogleReaderService = new GoogleReaderService();
                 NavigationService = new NavigationService();
-            }
+
+                GoogleReaderService.Authenticated += (s,e) => {
+                    if(e.IsAuthenticated == false && !NavigationService.CurrentUri().Contains(MainViewUrl)){
+                        NavigationService.NavigateTo(ViewModelLocator.MainViewUrl);
+                    }
+                };
+            }   
         }
 
+        public static string MainViewUrl = "/MainPage.xaml";
         public Object MainViewModel
         {
             get

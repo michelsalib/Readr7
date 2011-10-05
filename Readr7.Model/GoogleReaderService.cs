@@ -6,6 +6,7 @@ using Readr7.Model.Entites;
 using RestSharp;
 using Gi7.Model;
 using System.Net;
+using System.Windows;
 
 namespace Readr7.Model
 {
@@ -46,10 +47,8 @@ namespace Readr7.Model
             request.AddParameter("Passwd", password, ParameterType.GetOrPost);
             request.AddParameter("service", "reader", ParameterType.GetOrPost);
 
-            GlobalLoading.Instance.IsLoading = true;
             _call(client, request, loginData =>
             {
-                GlobalLoading.Instance.IsLoading = false;
                 var data = loginData.Content.Split('\n').Where(s => !String.IsNullOrWhiteSpace(s)).Select(d =>
                 {
                     var pair = d.Split('=');
@@ -82,10 +81,9 @@ namespace Readr7.Model
         {
             var tokenRequest = new RestRequest("reader/api/0/token", Method.GET);
             tokenRequest.AddParameter("SID", sid, ParameterType.Cookie);
-            GlobalLoading.Instance.IsLoading = true;
+
             _call(_client, tokenRequest, r =>
             {
-                GlobalLoading.Instance.IsLoading = false;
                 _token = r.Content;
             });
         }
@@ -96,12 +94,7 @@ namespace Readr7.Model
             if (!showRead)
                 feedRequest.AddParameter("xt", ReadTag, ParameterType.GetOrPost);
 
-            GlobalLoading.Instance.IsLoading = true;
-            _call<Feed>(feedRequest, f =>
-            {
-                GlobalLoading.Instance.IsLoading = false;
-                callback(f.Data);
-            });
+            _call<Feed>(feedRequest, callback);
         }
 
         public void GetFeed(Action<Feed> callback, Tag tag, bool showRead = false)
@@ -110,12 +103,7 @@ namespace Readr7.Model
             if (!showRead)
                 feedRequest.AddParameter("xt", ReadTag, ParameterType.GetOrPost);
 
-            GlobalLoading.Instance.IsLoading = true;
-            _call<Feed>(feedRequest, f =>
-            {
-                GlobalLoading.Instance.IsLoading = false;
-                callback(f.Data);
-            });
+            _call<Feed>(feedRequest, callback);
         }
 
         public void MarkAsRead(Item item, bool read = true)
@@ -127,8 +115,7 @@ namespace Readr7.Model
             request.AddParameter("s", item.Origin.StreamId, ParameterType.GetOrPost);
             request.AddParameter("async", "true", ParameterType.GetOrPost);
 
-            GlobalLoading.Instance.IsLoading = true;
-            _call<Feed>(request, r => { GlobalLoading.Instance.IsLoading = false; });
+            _call<Feed>(request, r => { });
         }
 
         public void GetTags(Action<List<Tag>> callback)
@@ -136,11 +123,9 @@ namespace Readr7.Model
             var request = new RestRequest("/reader/api/0/tag/list");
             request.AddParameter("output", "json");
 
-            GlobalLoading.Instance.IsLoading = true;
             _call<TagList>(request, t =>
             {
-                GlobalLoading.Instance.IsLoading = false;
-                callback(t.Data.Tags);
+                callback(t.Tags);
             });
         }
 
@@ -149,60 +134,64 @@ namespace Readr7.Model
             var request = new RestRequest("/reader/api/0/unread-count");
             request.AddParameter("output", "json");
 
-            GlobalLoading.Instance.IsLoading = true;
             _call<UnreadCounts>(request, t =>
             {
-                GlobalLoading.Instance.IsLoading = false;
-                var unread = t.Data.Unreadcounts.FirstOrDefault(u => u.Id.EndsWith("/state/com.google/reading-list"));
+                var unread = t.Unreadcounts.FirstOrDefault(u => u.Id.EndsWith("/state/com.google/reading-list"));
                 callback(unread != null ? unread.Count : 0);
             });
         }
 
-        private void _call<T>(RestRequest request, Action<RestResponse<T>> callback)
+        private void _call<T>(RestRequest request, Action<T> callback)
              where T : new()
         {
+            GlobalLoading.Instance.IsLoading = true;
             _client.ExecuteAsync<T>(request, r =>
             {
-                if (r.StatusCode == HttpStatusCode.Unauthorized)
+                GlobalLoading.Instance.IsLoading = false;
+                if (r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == HttpStatusCode.Forbidden)
                 {
+                    MessageBox.Show("Wrong credentials.");
                     if (Unauthorized != null)
                     {
                         Unauthorized(this, new EventArgs());
                     }
-                    GlobalLoading.Instance.IsLoading = false;
+                    Logout();
                 }
                 else if (r.ResponseStatus == ResponseStatus.Error)
                 {
+                    MessageBox.Show("Server unreachable.");
                     if (ConnectionError != null)
                     {
                         ConnectionError(this, new EventArgs());
                     }
-                    GlobalLoading.Instance.IsLoading = false;
                 }
                 else
-                    callback(r);
+                    callback(r.Data);
             });
         }
 
         private void _call(RestClient client, RestRequest request, Action<RestResponse> callback)
         {
+            GlobalLoading.Instance.IsLoading = true;
             client.ExecuteAsync(request, r =>
             {
-                if (r.StatusCode == HttpStatusCode.Unauthorized)
+                GlobalLoading.Instance.IsLoading = false;
+                if (r.StatusCode == HttpStatusCode.Unauthorized || r.StatusCode == HttpStatusCode.Forbidden)
                 {
+                    MessageBox.Show("Wrong credentials.");
                     if (Unauthorized != null)
                     {
                         Unauthorized(this, new EventArgs());
                     }
-                    GlobalLoading.Instance.IsLoading = false;
+                    Logout();
                 }
                 else if (r.ResponseStatus == ResponseStatus.Error)
                 {
+                    MessageBox.Show("Server unreachable.");
                     if (ConnectionError != null)
                     {
                         ConnectionError(this, new EventArgs());
                     }
-                    GlobalLoading.Instance.IsLoading = false;
                 }
                 else
                     callback(r);
