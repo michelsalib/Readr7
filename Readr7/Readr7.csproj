@@ -140,7 +140,6 @@
     <Content Include="Images\select.png" />
     <Content Include="Images\check.png" />
     <Content Include="Images\refresh.png" />
-    <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Readr7.Model\Readr7.Model.csproj">
