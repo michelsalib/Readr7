@@ -114,7 +114,7 @@ namespace Readr7.Model
             request.AddParameter("s", item.Origin.StreamId, ParameterType.GetOrPost);
             request.AddParameter("async", "true", ParameterType.GetOrPost);
 
-            _call<Feed>(request, r => { });
+            _call(_client, request, r => { });
         }
 
         public void GetTags(Action<List<Tag>> callback)
