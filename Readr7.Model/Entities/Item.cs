@@ -34,7 +34,25 @@ namespace Readr7.Model.Entites
                 if (value != _read)
                 {
                     _read = value;
-                    RaisePropertyChanged();
+                    RaisePropertyChanged("Read");
+                }
+            }
+        }
+        private bool? _starred;
+        public bool Starred
+        {
+            get
+            {
+                if (!_starred.HasValue)
+                    _starred = Categories.Any(category => category.EndsWith("/state/com.google/starred"));
+                return _starred.Value;
+            }
+            set
+            {
+                if (value != _starred)
+                {
+                    _starred = value;
+                    RaisePropertyChanged("Starred");
                 }
             }
         }

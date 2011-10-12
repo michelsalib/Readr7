@@ -22,6 +22,7 @@ namespace Readr7.Model
         }
 
         public const String ReadTag = "user/-/state/com.google/read";
+        public const String StarredTag = "user/-/state/com.google/starred";
 
         public event EventHandler<AuthenticatedEventArgs> Authenticated;
         public event EventHandler<LoadingEventArgs> Loading;
@@ -107,8 +108,18 @@ namespace Readr7.Model
 
         public void MarkAsRead(Item item, bool read = true)
         {
+            _markTag(item, ReadTag, read);
+        }
+
+        public void MarkAsStarred(Item item, bool starred = true)
+        {
+            _markTag(item, StarredTag, starred);
+        }
+
+        private void _markTag(Item item, string tag, bool add)
+        {
             var request = new RestRequest("/reader/api/0/edit-tag?pos=0&client=Readr7", Method.POST);
-            request.AddParameter(read ? "a" : "r", ReadTag, ParameterType.GetOrPost);
+            request.AddParameter(add ? "a" : "r", tag, ParameterType.GetOrPost);
             request.AddParameter("T", _token, ParameterType.GetOrPost);
             request.AddParameter("i", item.Id, ParameterType.GetOrPost);
             request.AddParameter("s", item.Origin.StreamId, ParameterType.GetOrPost);
@@ -155,7 +166,7 @@ namespace Readr7.Model
                         Unauthorized(this, new EventArgs());
                     Logout();
                 }
-                else if (r.ResponseStatus == ResponseStatus.Error)
+                else if (r.ResponseStatus == ResponseStatus.Error || r.StatusCode == HttpStatusCode.NotFound)
                 {
                     if (ConnectionError != null)
                         ConnectionError(this, new EventArgs());
@@ -179,7 +190,7 @@ namespace Readr7.Model
                         Unauthorized(this, new EventArgs());
                     Logout();
                 }
-                else if (r.ResponseStatus == ResponseStatus.Error)
+                else if (r.ResponseStatus == ResponseStatus.Error || r.StatusCode == HttpStatusCode.NotFound)
                 {
                     if (ConnectionError != null)
                         ConnectionError(this, new EventArgs());

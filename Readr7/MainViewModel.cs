@@ -90,6 +90,8 @@ namespace Readr7
         public RelayCommand<Item> FeedSelectedCommand { get; private set; }
         public RelayCommand<Item> ReadCommand { get; private set; }
         public RelayCommand<Item> UnreadCommand { get; private set; }
+        public RelayCommand<Item> StarredCommand { get; private set; }
+        public RelayCommand<Item> UnstarredCommand { get; private set; }
         public RelayCommand BottomReached { get; private set; }
         public RelayCommand<String> NavigateCommand { get; private set; }
 
@@ -117,6 +119,8 @@ namespace Readr7
             });
             ReadCommand = new RelayCommand<Item>(i => _read(i));
             UnreadCommand = new RelayCommand<Item>(i => _read(i, false));
+            StarredCommand = new RelayCommand<Item>(i => _starred(i));
+            UnstarredCommand = new RelayCommand<Item>(i => _starred(i, false));
             NavigateCommand = new RelayCommand<string>(s =>
             {
                 new WebBrowserTask()
@@ -173,6 +177,15 @@ namespace Readr7
                         Count = count
                     });
                 }
+            }
+        }
+
+        private void _starred(Item item, bool starred = true)
+        {
+            if (item.Starred != starred)
+            {
+                item.Starred = starred;
+                _googleReaderService.MarkAsStarred(item, starred);
             }
         }
 

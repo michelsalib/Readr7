@@ -62,6 +62,8 @@
                                     <toolkit:ContextMenu toolkit:TiltEffect.IsTiltEnabled="True">
                                         <toolkit:MenuItem Header="Mark as read" Visibility="{Binding Read, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}" Command="{Binding DataContext.ReadCommand, ElementName=FeedList}" CommandParameter="{Binding}"/>
                                         <toolkit:MenuItem Header="Mark as unread" Visibility="{Binding Read, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding DataContext.UnreadCommand, ElementName=FeedList}" CommandParameter="{Binding}"/>
+                                        <toolkit:MenuItem Header="Mark as favorite" Visibility="{Binding Starred, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter=invert}" Command="{Binding DataContext.StarredCommand, ElementName=FeedList}" CommandParameter="{Binding}"/>
+                                        <toolkit:MenuItem Header="Unmark as favorite" Visibility="{Binding Starred, Converter={StaticResource BoolToVisibilityConverter}}" Command="{Binding DataContext.UnstarredCommand, ElementName=FeedList}" CommandParameter="{Binding}"/>
                                     </toolkit:ContextMenu>
                                 </toolkit:ContextMenuService.ContextMenu>
                                 <Interactivity:Interaction.Triggers>
